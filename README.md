@@ -12,9 +12,6 @@ Go to the Mod Menu and click the configure icon to show the ModUpdater GUI or us
 ## Mod Developers
 [View Mod Developers](MOD_DEVELOPER.md)
 
-## Changelog
-[View Changelog](CHANGELOG.md)
-
 ## Credits
 - The icon was created by ``ProspectorDev``
 - The GitHub Releases strategy was written by ``AppleTheGolden``
