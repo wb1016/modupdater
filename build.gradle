@@ -1,0 +1,118 @@
+plugins {
+    id 'fabric-loom' version '0.5-SNAPSHOT'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'maven-publish'
+}
+
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+def mod_version = project.mod_version as Object
+version = "${mod_version}+${project.minecraft_version}"
+group = project.maven_group as Object
+
+configurations {
+    includeTransitive {
+        transitive = true
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+
+    implementation "com.squareup.moshi:moshi:${project.moshi_version}"
+    includeTransitive "com.squareup.moshi:moshi:${project.moshi_version}"
+
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+}
+
+project.afterEvaluate {
+    configurations.includeTransitive.incoming.resolutionResult.allComponents {
+        if (it.id instanceof ModuleComponentIdentifier) {
+            def that = it
+            dependencies {
+                include group: that.id.getGroup(), name: that.id.getModule(), version: that.id.getVersion()
+            }
+        }
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        expand "version": project.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
+}
+
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier "sources"
+    from sourceSets.main.allSource
+}
+
+jar {
+    from "LICENSE"
+}
+
+if (project.hasProperty('curseforge.api_key')) {
+    curseforge {
+        apiKey = project.getProperty('curseforge.api_key')
+        project {
+            id = project.curseforge_id
+            changelog = 'A changelog can be found at https://gitea.thebrokenrail.com/TheBrokenRail/ModUpdater/src/branch/master/CHANGELOG.md'
+            releaseType = 'release'
+            addGameVersion project.simple_minecraft_version
+            addGameVersion 'Fabric'
+            mainArtifact(remapJar) {
+                displayName = "ModUpdater v${mod_version} for ${project.minecraft_version}"
+            }
+            afterEvaluate {
+                uploadTask.dependsOn('remapJar')
+            }
+            relations {
+                requiredDependency 'fabric-api'
+            }
+        }
+        options {
+            forgeGradleIntegration = false
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+        }
+    }
+    repositories {
+        maven {
+            url '/data/maven'
+        }
+    }
+}
