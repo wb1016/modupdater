@@ -3,15 +3,10 @@
     "id": "modupdater",
     "version": "${version}",
     "name": "ModUpdater",
-    "description": "A simple Minecraft mod updater.",
+    "description": "A bad fork of simple Minecraft mod updater. not recommended to use in official release of minecraft.",
     "authors": [
-        "TheBrokenRail"
+        "TheBrokenRail, Blue-ON"
     ],
-    "contact": {
-        "homepage": "https://thebrokenrail.com/",
-        "sources": "https://gitea.thebrokenrail.com/TheBrokenRail/ModUpdater.git",
-        "issues": "https://gitea.thebrokenrail.com/TheBrokenRail/ModUpdater/issues"
-    },
     "icon": "assets/modupdater/icon.png",
     "license": "MIT",
     "environment": "*",
@@ -25,12 +20,7 @@
     },
     "depends": {
         "fabricloader": ">=0.7.4",
-        "fabric": "*"
-    },
-    "custom": {
-        "modupdater": {
-            "strategy": "curseforge",
-            "projectID": 391583
-        }
+        "fabric": "*",
+        "minecraft": ">=1.16.1"
     }
 }

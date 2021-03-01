@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.5-SNAPSHOT'
+    id 'fabric-loom' version '0.6-SNAPSHOT'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'maven-publish'
 }
@@ -87,7 +87,7 @@ if (project.hasProperty('curseforge.api_key')) {
             addGameVersion project.simple_minecraft_version
             addGameVersion 'Fabric'
             mainArtifact(remapJar) {
-                displayName = "ModUpdater v${mod_version} for ${project.minecraft_version}"
+                displayName = "ModUpdater for ${project.minecraft_version}"
             }
             afterEvaluate {
                 uploadTask.dependsOn('remapJar')
